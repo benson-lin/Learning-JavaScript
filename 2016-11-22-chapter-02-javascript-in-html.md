@@ -5,17 +5,18 @@
 **1.在页面内直接写JavaScript代码**
 
 ```javascript
-<script>
-    function sayHi() {
-        alert("Hi");
-    }
-</script>     
+	<script type="text/javascript">
+		function sayHi(){
+			console.log("Hi");
+		}
+		sayHi();
+	</script>
 ```
 
 **2.引用外部JavaScript文件**
 
 ```javascript
-<script src="example.js"></script>
+<script type="text/javascript" src="sample.js"></script>
 ```
 
 `<script>`标签对内不能出现`</script>`

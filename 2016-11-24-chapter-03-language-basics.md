@@ -54,7 +54,7 @@ Undefi
 
 ### Null
 
-Null类型也只有一个值，即特殊的null。从逻辑角度来看，null表示一个**空对象指针**，因此，typeof操作符检测null会返回”object“。** null == undefined会返回true**，这是因为==操作符处于比较的目的会转换其操作数。
+Null类型也只有一个值，即特殊的null。从逻辑角度来看，null表示一个**空对象指针**，因此，typeof操作符检测null会返回"object"。**null == undefined会返回true**，这是因为==操作符处于比较的目的会转换其操作数。
 
 ```js
 null == undefined
@@ -111,7 +111,7 @@ var octalNum3 = 08; //invalid octal - interpreted as 8
 保存浮点数值需要的内存空间是保存整数值的**两倍**，因此ECMAScript会**尽可能**地将浮点数转换为整数值。
 
 
-ECMAScript的最小数值为 `Number.MIN_VALUE=5e-324`,最大数值为 `Number.MAX_VALUE=1.797693134623157e+308`。如果超出JavaScript的数值范围，将会自动转为Infinity, 或者-Infinity,这两个值不能参与计算。可以用 `isFinite( )` 函数判断一个数值是不是有穷的。可以通过 `Number.NEGATIVE_INFINITY` 和 `Number.POSITIVE_INFINITY` 获取这iangge值。
+ECMAScript的最小数值为 `Number.MIN_VALUE=5e-324`,最大数值为 `Number.MAX_VALUE=1.797693134623157e+308`。如果超出JavaScript的数值范围，将会自动转为Infinity, 或者-Infinity,这两个值不能参与计算。可以用 `isFinite( )` 函数判断一个数值是不是有穷的。可以通过 `Number.NEGATIVE_INFINITY` 和 `Number.POSITIVE_INFINITY` 获取这两个值。
 
 ```js
 n = Number.NEGATIVE_INFINITY;
@@ -139,9 +139,9 @@ alert(isNaN(true)); //false - can be converted to number 1
 Number()函数其转换规则如下：
 
 - 如果是Boolean值，true和false将分别被转换为1和0；
-- 如果是数字值，知识简单的传入和返回；
+- 如果是数字值，只是简单的传入和返回；
 - 如果是null值，返回0；
-- 如果是undefined，返回NaN。
+- **如果是undefined，返回NaN。**
 - 如果是字符串，规则如下：
  - 如果字符串中只包含数字（包括前面带正号或负号的情况），则将其转换为十进制数值（前导的零被忽略）'011'->11，而不是八进制；
  - 如果字符串中包含有效的浮点格式，如“1.1”，则将其转换为对应的浮点数值（前导的零被忽略）；
@@ -159,7 +159,19 @@ var num4 = Number(true); //1
 ```
 
 
-parseInt()更常用，它会忽略前面的空格和非法字符，直到找到第一个有效字符。如果没有找到有效的字符(数字字符或符号)，返回NaN，比如parseInt("")将返回NaN; 继续解析知道遇到一个非数字字符或字符结束，后面的非数字字符会被忽略。  
+parseInt()更常用，核心是遇到字母就停止解析，并就已经解析的部分进行转换为不同的值，有些是无效的，有些是有效的。
+
+
+- 如果是第一位不是0就遇到字母就停止解析，并把字母前面的值作为10进制去解析，如果第一个就是字母那么值就是空，空成了NaN,比如:
+parseInt("a")==>parseInt("",10)==>NaN.
+parseInt("10a")==>parseInt("10")==>parseInt("10",10)==>10;
+- 如果第一位是0,且第2位不是x也和上面一样遇到字母就停止解析，并把字母前面的值作为8进制去解析,比如:
+parseInt("0a")==>parseInt("0")==>parseInt("0",10)==>0.
+PS:这个有点特殊，因为0a被解析成了0，还不具备看做是8进制的结构，下面那个就明显了。
+parseInt("010a")==>parseInt("010")==>parseInt("10",8)==>8;
+- 如果第一位是0,且第2位是x那后面也和上面一样遇到字母就停止解析，并把字母前面的值作为16进制去解析,比如:
+parseInt("0xt")==>parseInt("",16)==>NaN.
+parseInt("0x12t")==>parseInt("12",16)==>18.
 
 ```js
 var num1 = parseInt(“1234blue”); //1234
@@ -303,7 +315,7 @@ alert(!12345); //false
 - 如果操作数都是数值，执行常规的除法计算，如果商超过了ECMAScript数值的表示范围，则返回Infinity或-Infinity；
 - 如果有一个操作数是NaN，则结果是NaN；
 - 如果是Infinity被Infinity除，则结果是NaN；
-- 如果是零被领出，则结果是NaN；
+- 如果是零被零除，则结果是NaN；
 - 如果是非零的有限数被零除，则结果是Infinity或-Infinity，取决于有符号操作数的符号；
 - 如果是Infinity被任何非零数值除，则结果是Infinity或-Infinity，取决于有符号操作数的符号。
 - 如果有一个操作数不是数值，则在后台调用Number( )将其转换为数值，然后再应用之前的规则。

@@ -584,6 +584,19 @@ function foo2(){
 }
 ```
 
+例子：用Math求数组中的最大值。
+
+```js
+var arr=[1,3,6,3,7,9,2];
+console.log(Math.max.apply(null,arr));
+```
+
+Function.apply()是JS的一个OOP特性，一般用来模拟继承和扩展this的用途，对于上面这段代码，可以这样去理解：
+
+
+XXX.apply是一个调用函数的方法，其参数为：apply(Function, Args)，Function为要调用的方法，Args是参数列表，当Function为null时，默认为上文，即Math.max.apply(null, arr),可认为是apply(Math.max, arr).然后，arr是一个参数列表，对于max方法，其参数是若干个数，即Math.max(a, b, c, d, ...);当使用apply时，把所有参数加入到一个数组中，即arr =  [a, b, c, d, ...]代入到原式，Math.max.apply(null, [a, b, c, d, ...])实际上等同于Math.max(a, b, c, d, ...)在此处，使用apply的优点是在部分JS引擎中提升性能。
+
+
 
 apply()和call()最强大的地方在于能够**扩充函数赖以运行的作用域，可以随时变换内部的this对象**。好处是对象不需要与方法有任何耦合关系。
 
@@ -612,4 +625,493 @@ function sayColor(){
 var objectSayColor = sayColor.bind(o);
 objectSayColor(); //blue
 ```
+
+## RegExp
+
+
+RegExp类型，字面量形式语法为：
+varexpression = /pattern/ flag;
+
+模式（pattern）部分可以是任何简单或复杂的正则表达式，可以包含字符类、限定符、分组、向前查找以及反向引用。每个正则表达式都可带有一或多个标志(flags)，用以标明正则表达式的行为。
+
+g: 表示全局(global)模式，即模式将被应用于所有字符串，而非在发现第一个匹配项时立即停止；
+i : 表示不区分大小写模式，即在确定匹配项时忽略模式与字符串的大小写；
+m：表示多行模式，即在到达一行文本末尾时还未继续查找下一行中，是否存在于模式匹配的项。记住：不往前找。
+
+
+```js
+/*
+* Match all instances of “at” in a string.
+*/
+var pattern1 = /at/g;
+/*
+* Match the first instance of “bat” or “cat”, regardless of case.
+*/
+var pattern2 = /[bc]at/i;
+/*
+* Match all three-character combinations ending with ”at”, regardless of case.
+*/
+var pattern3 = /.at/gi;
+```
+
+模式中使用的**所有元字符都必须转义**，正则表达式中的元字符包括：( [ { \ ^ $ | } ? * + . ] }
+
+
+
+```js
+/*
+* Match the first instance of “bat” or “cat”, regardless of case.
+*/
+var pattern1 = /[bc]at/i;
+/*
+* Match the first instance of ”[bc]at”, regardless of case.
+*/
+var pattern2 = /\[bc\]at/i;
+/*
+* Match all three-character combinations ending with ”at”, regardless of case.
+*/
+var pattern3 = /.at/gi;
+/*
+* Match all instances of ”.at”, regardless of case.
+*/
+var pattern4 = /\.at/gi;
+```
+
+使用RegExp构造函数创建正则表达式，两个参数：一个是要匹配的字符串模式，一个是可选的标志字符串。这两个参数都是字符串。由于RegExp构造函数的模式参数都是字符串，所有字符都必须双重转义，已经转义过的字符也是如此
+
+使用正则表达式字面量和使用RegExp构造函数创建的正则表达式**不一样**。
+
+```js
+/*
+* Same as pattern1, just using the constructor.
+*/
+var pattern2 = new RegExp(“[bc]at”, “i”);
+```
+
+在ECMAScript 3中，正则表达式字面量始终会共享同一个RegExp实例，而使用构造函数创建的每一个新RegExp实例都是一个新实例。但在**ECMAScript5中，两者都会创建新的RegExp实例**。
+
+```js
+var re = null,
+i;
+for (i=0; i < 10; i++){
+	re = /cat/g;
+	re.test(“catastrophe”);
+}
+for (i=0; i < 10; i++){
+	re = new RegExp(“cat”, “g”);
+	re.test(“catastrophe”);
+}
+```
+
+### RegExp 实例属性
+
+- global：布尔值，表示是否设置了g标志；
+- ignoreCase: 布尔值，表示是否设置了i标志；
+- lastIndex : 整数，表示开始搜索下一个匹配项的字符位置，从0算起；
+- multiline: 布尔值，表示是否设置了m标志；
+- source：正则表达式的字符串表示，按照字面量形式而非传入构造函数中的字符串模式返回。
+
+
+通过这些属性可以得知一个正则表达式的各方面信息，但是没有多大用处，因为本身就包含在模式声明里了。
+
+```js
+var pattern1 = /\[bc\]at/i;
+alert(pattern1.global); //false
+alert(pattern1.ignoreCase); //true
+alert(pattern1.multiline); //false
+alert(pattern1.lastIndex); //0
+alert(pattern1.source); //”\[bc\]at”
+
+var pattern2 = new RegExp(“\\[bc\\]at”, “i”);
+alert(pattern2.global); //false
+alert(pattern2.ignoreCase); //true
+alert(pattern2.multiline); //false
+alert(pattern2.lastIndex); //0
+alert(pattern2.source); //”\[bc\]at”
+```
+
+### RegExp 实例方法
+
+**exec()**: 专门为**捕获组**而设计的。exec( )接收一个参数，即要应用模式的字符串，然后返回包含第一个匹配项信息的数组，若无匹配项，则返回null。返回的数组是Array的实例，但包含两个额外的属性：index和input。index表示匹配性在字符串的位置，input表示应正则表达式字符串。
+
+```js
+var text = “mom and dad and baby”;
+var pattern = /mom( and dad( and baby)?)?/gi;
+var matches = pattern.exec(text);
+alert(matches.index); //0
+alert(matches.input); //”mom and dad and baby”
+alert(matches[0]); //”mom and dad and baby”
+alert(matches[1]); //” and dad and baby”
+alert(matches[2]); //” and baby”
+```
+
+对于exec()方法而言，**不设置全局标志**的情况下，在同一个字符串中多次调用exec()将**始终返回第一个匹配项**的信息，而在设置全局标志的情况下，每次调用exec()则都会在字符串中继续查找新匹配项。
+
+```js
+var text = “cat, bat, sat, fat”;
+var pattern1 = /.at/;
+
+var matches = pattern1.exec(text);
+alert(matches.index); //0
+alert(matches[0]); //cat
+alert(pattern1.lastIndex); //0
+
+matches = pattern1.exec(text);
+alert(matches.index); //0
+alert(matches[0]); //cat
+alert(pattern1.lastIndex); //0
+
+var pattern2 = /.at/g;
+var matches = pattern2.exec(text);
+alert(matches.index); //0
+alert(matches[0]); //cat
+alert(pattern2.lastIndex); //0
+
+matches = pattern2.exec(text);
+alert(matches.index); //5
+alert(matches[0]); //bat
+alert(pattern2.lastIndex); //8
+```
+
+
+**test()**: 接收一个字符串参数，在模式与该参数匹配的情况下返回true，否则返回false。
+
+正则表达式的**valueOf()**方法返回正则表达式本身,toLocaleString和toString方法都返回正则表达式字面量。
+
+```js
+var text = “000-00-0000”;
+var pattern = /\d{3}-\d{2}-\d{4}/;
+if (pattern.test(text)){
+	alert(”The pattern was matched.”);
+}
+
+var pattern = new RegExp(“\\[bc\\]at”, “gi”);
+alert(pattern.toString()); // /\[bc\]at/gi
+alert(pattern.toLocaleString()); // /\[bc\]at/gi
+```
+
+### RegExp 构造函数属性
+
+- input 最近一次要匹配的字符串。Opera未实现
+- lastMatch 最近一次的匹配项。Opera未实现
+- lastParen 最近一次匹配的捕获组。Opera未实现
+- leftContext input字符串中的lastMatch之前的文本
+- multiline 是否所有表达式都使用多行模式。IE和Opera未实现
+- rightContext input字符串中lastMatch之后的文本
+
+这些属性适用于作用域内的所有正则表达式，并且基于所执行的最近一次正则表达式操作而变化
+
+```js
+    var text = "this has been a short summer";
+    var pattern = /(.)hort/g;
+    /*
+    * 注意：Opera 不支持 input、lastMatch、lastParen 和 multiline 属性
+    * Internet Explorer 不支持 multiline 属性
+    */
+    if (pattern.test(text)){
+        alert(RegExp.input); // this has been a short summer
+        alert(RegExp.leftContext); // this has been a
+        alert(RegExp.rightContext); // summer
+        alert(RegExp.lastMatch); // short
+        alert(RegExp.lastParen); // s
+        alert(RegExp.multiline); // false
+    }
+
+    pattern = /(..#)or(.)/g;
+    if (pattern.test(text)){
+        alert(RegExp.$1); //sh
+        alert(RegExp.$2); //t
+    }
+```
+
+除了这几个属性，构造构造函数还有多达9个用于存储捕获组的属性。语法为RegExp.$1、RegExp.$2等，分别用于存储第一到第九个捕获组
+
+```js
+var text = “this has been a short summer”;
+var pattern = /(..)or(.)/g;
+if (pattern.test(text)){
+	alert(RegExp.$1); //sh
+	alert(RegExp.$2); //t
+}
+```
+
+## 基本包装类型
+
+ECMAScript提供了3个特殊的引用类型：**Boolean、Number和String**。每当读取一个基本类型值的时候，后台都会创建一个对应的基本包装类型的对象。
+
+```js
+var s1 = “some text”;
+var s2 = s1.substring(2);
+
+// 等同于
+var s1 = new String(“some text”);
+var s2 = s1.substring(2);
+s1 = null;
+```
+
+
+引用类型与基本包装类型的主要区别就是**对象的生存期**。使用new时创建引用类型实例后，但是一旦引用类型方法执行完毕，则立即销毁。因此**不能为基本类型添加方法和属性**。
+
+```js
+var s1 = “some text”;
+s1.color = “red”;
+// 上面执行完后，String对象就被销毁了。
+alert(s1.color); //undefined
+```
+
+
+可以显式的用new Boolean，new Number和new String创建基本包装类型对象。不过不要这样做,让人分不清实在处理基本类型还是引用类型，一旦new了，使用typeof就会返回object，
+
+```js
+var obj = new Number(value); //constructor
+alert(typeof obj); //”object”
+```
+
+Object的构造函数能够根据传入的值返回对应的基本包装类型的实例，相当于内部使用了new。
+
+```js
+var obj = new Object(“some text”);
+alert(obj instanceof String); //true
+```
+
+还要注意**区分转型函数和构造函数**的区别，一个有new，一个没有，typeof的结果也是不一样的。
+
+```js
+var value = “25”;
+var number = Number(value); //casting function
+alert(typeof number); //”number”
+
+var obj = new Number(value); //constructor
+alert(typeof obj); //”object”
+```
+
+### Boolean类型
+
+
+所有对象在转为布尔值是都变成了true，即使原来的基本类型是false。
+
+```js
+var falseObject = new Boolean(false);
+var result = falseObject && true;
+alert(result); //true
+
+var falseValue = false;
+result = falseValue && true;
+alert(result); //false
+
+// 因为
+alert(typeof falseObject); //object
+alert(typeof falseValue); //boolean
+alert(falseObject instanceof Boolean); //true
+alert(falseValue instanceof Boolean); //false
+```
+
+
+### Number类型
+
+还是一样，不要使用new创建Number对象，因为instanceof和typeof的结果会完全不同。
+
+```js
+var numberObject = new Number(10);
+var numberValue = 10;
+alert(typeof numberObject); //”object”
+alert(typeof numberValue); //”number”
+alert(numberObject instanceof Number); //true
+alert(numberValue instanceof Number); //false
+```
+
+在**自动**转为Number之后有如下方法可以使用，这里的自动强调我们直接使用基本类型的形式去调用方法。
+
+valueOf():返回对象对应的基本类型数值
+toString()/toLocaleString():返回字符串形式的数值，可传入参数表示要转为多少进制
+toFixed():返回指定小数个数的数值对应的字符串
+toExponential(n):使用科学技术法E表示
+toPrecision():要科学计数法表示最适合的格式，可能返回固定大小格式fixed，也可能返回指数形式exponential
+
+```js
+var num = 10;
+alert(num.toString()); //”10”
+alert(num.toString(2)); //”1010”
+alert(num.toString(8)); //”12”
+alert(num.toString(10)); //”10”
+alert(num.toString(16)); //”a”
+
+var num = 10;
+alert(num.toFixed(2)); //”10.00”
+var num = 10.005;
+alert(num.toFixed(2)); //”10.01”
+
+var num = 10;
+alert(num.toExponential(1)); //”1.0e+1”
+
+var num = 99;
+alert(num.toPrecision(1)); //”1e+2”
+alert(num.toPrecision(2)); //”99”
+alert(num.toPrecision(3)); //”99.0”
+
+
+
+
+```
+
+### String类型
+ 
+
+
+slice(),substring():第一个参数指定字符串开始位置，第二个参数指定结束位置，如果不指定则到结尾；如果有负数，会与字符串长度相加
+substr()：第二个参数指定要截取的字符个数；如果有负数，将把负数变为0
+
+```js
+var stringValue = “hello world”;
+alert(stringValue.slice(3)); //”lo world”
+alert(stringValue.substring(3)); //”lo world”
+alert(stringValue.substr(3)); //”lo world”
+alert(stringValue.slice(3, 7)); //”lo w”
+alert(stringValue.substring(3,7)); //”lo w”
+alert(stringValue.substr(3, 7)); //”lo worl”
+
+var stringValue = “hello world”;
+alert(stringValue.slice(-3)); //”rld” 11-3=8
+alert(stringValue.substring(-3)); //”hello world”
+alert(stringValue.substr(-3)); //”rld”
+alert(stringValue.slice(3, -4)); //”lo w”
+alert(stringValue.substring(3, -4)); //”hel”
+alert(stringValue.substr(3, -4)); //”” (empty string)
+
+```
+
+charAt() charCodeAt() concat() indexOf() lastIndexOf()
+trim()：创建字符串副本，删除前置和后缀的所有空格，原始字符串不变，还有trimLeft和trimRight
+toLowerCase()、toLocaleCase()、toUpperCase()和toLocaleUpperCase()。
+
+
+```js
+var stringValue = “hello world”;
+alert(stringValue.charAt(1)); //”e”
+
+var stringValue = “hello world”;
+alert(stringValue.charCodeAt(1)); //outputs “101”
+
+var stringValue = “hello “;
+var result = stringValue.concat(“world”);
+alert(result); //”hello world”
+alert(stringValue); //”hello”
+
+
+var stringValue = “hello world”;
+alert(stringValue.indexOf(“o”)); //4
+alert(stringValue.lastIndexOf(“o”)); //7
+
+var stringValue = “hello world”;
+alert(stringValue.indexOf(“o”, 6)); //7
+alert(stringValue.lastIndexOf(“o”, 6)); //4
+
+var stringValue = “ hello world “;
+var trimmedStringValue = stringValue.trim();
+alert(stringValue); //” hello world “
+alert(trimmedStringValue); //”hello world
+
+var stringValue = “hello world”;
+alert(stringValue.toLocaleUpperCase()); //”HELLO WORLD”
+alert(stringValue.toUpperCase()); //”HELLO WORLD”
+alert(stringValue.toLocaleLowerCase()); //”hello world”
+alert(stringValue.toLowerCase()); //”hello world”
+
+```
+
+
+
+match(): 只接受一个参数，要么是一个正则表达式，要么是一个RegExp对象。返回一个数组，数组的第一项是与整个模式匹配的字符串，之后的每一项（如果有）保存着与正则表达式中的捕获组匹配的字符串。
+search(): 只接收一个参数，要么是一个正则表达式，要么是一个RegExp对象。返回字符串中第一个匹配项的索引，若无匹配项，则返回-1.该方法始终是从字符串开头向后查找模式。
+replace(): 接受两个参数：第一个参数可以是一个RegExp对象或者一个字符串（这个字符串不会被转换成正则表达式），第二个参数可以是一个字符串或者一个函数，此时函数接受3个参数：模式的匹配项、模式匹配项在字符串中的位置和原始字符串。
+split()可以基于指定的分隔符将一个字符串分割成多个子字符串，并将结果放在一组数组中，分隔符可以是字符串，也可以是一个RegExp对象（这个字符串不会被转换成正则表达式）。split( )方法可以接收可选的第二个参数，用于指定数组的大小，以确保返回的数组不会超过既定大小。
+
+
+```js
+var text = “cat, bat, sat, fat”;
+var pattern = /.at/;
+//same as pattern.exec(text)
+var matches = text.match(pattern);
+alert(matches.index); //0
+alert(matches[0]); //”cat”
+alert(pattern.lastIndex); //0
+
+var text = “cat, bat, sat, fat”;
+var pos = text.search(/at/);
+alert(pos); //1
+
+var text = “cat, bat, sat, fat”;
+var result = text.replace(“at”, “ond”);
+alert(result); //”cond, bat, sat, fat”
+result = text.replace(/at/g, “ond”);
+alert(result); //”cond, bond, sond, fond”
+
+var colorText = “red,blue,green,yellow”;
+var colors1 = colorText.split(“,”); //[“red”, “blue”, “green”, “yellow”]
+var colors2 = colorText.split(“,”, 2); //[“red”, “blue”]
+var colors3 = colorText.split(/[^\,]+/); //[“”, “,”, “,”, “,”, “”]
+```
+
+
+## 单体内置对象
+
+ECMA-262对内置对象的定义：由ECMAScript实现提供的，不依赖于宿主环境的对象，这些对象在ECMAScript程序执行之前就已经存在了。开发人员不必显式的实例化内置对象。前面说的Object,Array和String都是内置对象，还定义了两个单体内置对象：Global和Math。
+
+
+### Global
+
+
+Global对象不属于任何其他对象的属性和方法；实际上没有全局变量和全局函数，所有在全局作用域中定义的属性和函数，其实都是Global对象的属性和方法。如isNaN(), isFinite(), parseInt()等都是Global对象的方法；除此之外还有其他方法。
+
+**encodeURI()/encodeURIComponent()**： 可以对URI进行编码，以便发给浏览器。其中，encodeURI( )主要用于整个URI，而encodeURIComponent()主要用于对URI中的某一段进行编码。区别在于，encodeURI( )不会对本身属于URI的特殊字符进行编码，例如冒号、正斜杠、问号和井字号，而encodeURIComponent()则会对它发现的任何非标准字符进行编码。对应的有**decodeURI()和decodeURIComponent()**解码方法。
+
+**eval()**：是ECMAScript语言中最强大的一个方法，就像一个完整的ECMAScript解析器，它只接收一个参数，即要执行的ECMAScript（或JavaScript）字符串。当浏览器发现eval方法时，传入的参数会被认为是该次调用的执行环境的一部分。严格模式下，在外部访问不到eval( )中创建的任何变量或函数，也不能为eval赋值。
+
+```js
+eval(“alert(‘hi’)”);
+
+var msg = “hello world”;
+eval(“alert(msg)”); //”hello world”
+
+eval(“function sayHi() { alert(‘hi’); }”);
+sayHi();
+
+eval(“var msg = ‘hello world’;”);
+alert(msg); //”hello world”
+
+“use strict”;
+eval = “hi”; //causes error
+```
+
+Global对象的所有属性：undefined, NaN, Infinity, Object, Array, Function, String, Number, Date, RegExp, Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError, URIError；ECMAScript5明确禁止给undefined, NaN, Infinity赋值。
+
+### window 对象
+
+ECMAScript没有指出如何直接访问Global对象，但是浏览器将Global作为window对象的一部分实现了，在全局作用域声明的所有变量和函数，都成了window的属性
+
+```js
+var color = “red”;
+function sayColor(){
+	alert(window.color);
+}
+window.sayColor(); //”red”
+```
+
+还可以通过另一个种方式获取Global对象
+
+```js
+var global = function(){
+	return this;
+}();
+```
+
+### Math 对象
+
+min,max,ceil(向上取整),floor(向下取整),round(四舍五入),random, abs, sqrt, pow等
+
+min和max不能传递数组，只能传递序列，可以使用Math.max.apply(Math, [1,2,3,4,5,6,64,3,2])。
+
+random使用：默认返回0<=x<1的数。一般使用var num = Math.floor(Math.random() * B +A)得到的num的结果是从A开始到A+B-1的一个随机数；如Math.floor(Math.random()*9+2);获取2到10九个数的其中一个
+
+
 

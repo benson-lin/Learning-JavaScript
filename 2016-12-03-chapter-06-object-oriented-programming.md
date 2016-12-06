@@ -6,17 +6,17 @@
 
 ```js
 var person = new Object();
-person.name = “Nicholas”;
+person.name = "Nicholas";
 person.age = 29;
-person.job = “Software Engineer”;
+person.job = "Software Engineer";
 person.sayName = function(){
 	alert(this.name);
 };
 
 var person = {
-name: “Nicholas”,
+name: "Nicholas",
 age: 29,
-job: “Software Engineer”,
+job: "Software Engineer",
 sayName: function(){
 	alert(this.name);
 }
@@ -73,14 +73,14 @@ alert(person.name);
 
 ```js
 var person = {};
-Object.defineProperty(person, “name”, {
+Object.defineProperty(person, "name", {
 	configurable: false,
-	value: “Nicholas”
+	value: "Nicholas"
 });
 // 报错
-Object.defineProperty(person, “name”, {
+Object.defineProperty(person, "name", {
 	configurable: true,
-	value: “Nicholas”
+	value: "Nicholas"
 });
 ```
 
@@ -121,7 +121,7 @@ var book = {
 	_year: 2004,
 	edition: 1
 };
-Object.defineProperty(book, “year”, {
+Object.defineProperty(book, "year", {
 	get: function(){
 		return this._year;
 	},
@@ -167,19 +167,22 @@ Object.defineProperties(book, {
 **4. 读取属性的特性**：属性的特性指的是前面的六个属性(value,configurable,writable,enumerable,get,set)，ECMAScript5的Object.getOwnPropertyDescriptor()方法独特给定属性的描述符，从而获取value, configurable, writable等值。
 
 ```js
-var descriptor = Object.getOwnPropertyDescriptor(book, “_year”);
+var descriptor = Object.getOwnPropertyDescriptor(book, "_year");
 alert(descriptor.value); //2004
 alert(descriptor.confi gurable); //false
-alert(typeof descriptor.get); //”undefined”
+alert(typeof descriptor.get); //"undefined"
 
-var descriptor = Object.getOwnPropertyDescriptor(book, “year”);
+var descriptor = Object.getOwnPropertyDescriptor(book, "year");
 alert(descriptor.value); //undefined
 alert(descriptor.enumerable); //false
-alert(typeof descriptor.get); //”function”
+alert(typeof descriptor.get); //"function"
 ```
 
 
 ## 对象的创建
+
+几种模式：工厂模式、构造函数模式、原型模式、组合使用构造模式和原型模式、动态原型模式、寄生构造函数模式、稳妥构造函数模式
+
 
 **1. 工厂模式**：
 
@@ -194,8 +197,8 @@ function createPerson(name, age, job){
 	};
 	return o;
 }
-var person1 = createPerson(“Nicholas”, 29, “Software Engineer”);
-var person2 = createPerson(“Greg”, 27, “Doctor”);
+var person1 = createPerson("Nicholas", 29, "Software Engineer");
+var person2 = createPerson("Greg", 27, "Doctor");
 ```
 
 工厂模式虽解决了多个相似对象问题，但没有解决对象识别的问题，即不知道一个对象类型。
@@ -212,8 +215,8 @@ function Person(name, age, job){
 		alert(this.name);
 	};
 }
-var person1 = new Person(“Nicholas”, 29, “Software Engineer”);
-var person2 = new Person(“Greg”, 27, “Doctor”);
+var person1 = new Person("Nicholas", 29, "Software Engineer");
+var person2 = new Person("Greg", 27, "Doctor");
 ```
 
 构造函数模式在原生构造函数如Array，Object中就出现了。这里没有显式创建对象；直接将属性和方法赋给了this对象；也没有return语句。在使用new后将this分别指向person1和person2实例；
@@ -237,17 +240,17 @@ alert(person2 instanceof Person); //true
 
 ```js
 //use as a constructor
-var person = new Person(“Nicholas”, 29, “Software Engineer”);
-person.sayName(); //”Nicholas”
+var person = new Person("Nicholas", 29, "Software Engineer");
+person.sayName(); //"Nicholas"
 
 //call as a function
-Person(“Greg”, 27, “Doctor”); //adds to window
-window.sayName(); //”Greg”
+Person("Greg", 27, "Doctor"); //adds to window
+window.sayName(); //"Greg"
 
 //call in the scope of another object
 var o = new Object();
-Person.call(o, “Kristen”, 25, “Nurse”);
-o.sayName(); //”Kristen”
+Person.call(o, "Kristen", 25, "Nurse");
+o.sayName(); //"Kristen"
 ```
 
 - 第一种：最常见的没问题；
@@ -264,7 +267,7 @@ function Person(name, age, job){
 	this.name = name;
 	this.age = age;
 	this.job = job;
-	this.sayName = new Function(“alert(this.name)”); //logical equivalent
+	this.sayName = new Function("alert(this.name)"); //logical equivalent
 }
 
 alert(person1.sayName == person2.sayName); //false
@@ -282,11 +285,11 @@ function Person(name, age, job){
 function sayName(){
 	alert(this.name);
 }
-var person1 = new Person(“Nicholas”, 29, “Software Engineer”);
-var person2 = new Person(“Greg”, 27, “Doctor”);
+var person1 = new Person("Nicholas", 29, "Software Engineer");
+var person2 = new Person("Greg", 27, "Doctor");
 ```
 
-全局函数确实减少了Function对象的创建，但是问题是这个函数明明只是用在某些对象上，现在放到了全部上，很不合理；封装角度而言也是不合理的。因此引入原型模式。
+全局函数确实减少了Function对象的创建，但是问题是这个函数明明只是用在某些对象上，现在放到了全局上，很不合理；封装角度而言也是不合理的。因此引入原型模式。
 
 
 **3. 原型模式：下面一大节**
@@ -298,18 +301,18 @@ var person2 = new Person(“Greg”, 27, “Doctor”);
 ```
 function Person(){
 }
-Person.prototype.name = “Nicholas”;
+Person.prototype.name = "Nicholas";
 Person.prototype.age = 29;
-Person.prototype.job = “Software Engineer”;
+Person.prototype.job = "Software Engineer";
 Person.prototype.sayName = function(){
 	alert(this.name);
 };
 
 var person1 = new Person();
-person1.sayName(); //”Nicholas”
+person1.sayName(); //"Nicholas"
 
 var person2 = new Person();
-person2.sayName(); //”Nicholas”
+person2.sayName(); //"Nicholas"
 
 alert(person1.sayName == person2.sayName); //true
 ```
@@ -336,7 +339,7 @@ ECMAScript5中增加了Object.getPrototypeOf()方法，返回[[Prototype]]的值
 
 ```js
 alert(Object.getPrototypeOf(person1) == Person.prototype); //true
-alert(Object.getPrototypeOf(person1).name); //”Nicholas”
+alert(Object.getPrototypeOf(person1).name); //"Nicholas"
 ```
 
 确定属性时会先从实例本身搜索，如果找到则终止返回，否则从原型中查找。
@@ -347,9 +350,9 @@ alert(Object.getPrototypeOf(person1).name); //”Nicholas”
 function Person(){
 }
 
-Person.prototype.name = “Nicholas”;
+Person.prototype.name = "Nicholas";
 Person.prototype.age = 29;
-Person.prototype.job = “Software Engineer”;
+Person.prototype.job = "Software Engineer";
 Person.prototype.sayName = function(){
 	alert(this.name);
 };
@@ -357,30 +360,30 @@ Person.prototype.sayName = function(){
 var person1 = new Person();
 var person2 = new Person();
 
-person1.name = “Greg”;
-alert(person1.name); //”Greg” - from instance
-alert(person2.name); //”Nicholas” - from prototype
+person1.name = "Greg";
+alert(person1.name); //"Greg" - from instance
+alert(person2.name); //"Nicholas" - from prototype
 ```
 
 ```js
 function Person(){
 }
 
-Person.prototype.name = “Nicholas”;
+Person.prototype.name = "Nicholas";
 Person.prototype.age = 29;
-Person.prototype.job = “Software Engineer”;
+Person.prototype.job = "Software Engineer";
 Person.prototype.sayName = function(){
 	alert(this.name);
 };
 
 var person1 = new Person();
 var person2 = new Person();
-person1.name = “Greg”;
-alert(person1.name); //”Greg” - from instance
-alert(person2.name); //”Nicholas” - from prototype
+person1.name = "Greg";
+alert(person1.name); //"Greg" - from instance
+alert(person2.name); //"Nicholas" - from prototype
 
 delete person1.name; //重点
-alert(person1.name); //”Nicholas” - from the prototype
+alert(person1.name); //"Nicholas" - from the prototype
 ```
 
 **hasOwnProperty()**方法用来判断是否是实例本身而不是其原型拥有的属性，如果是实例本身拥有的，则返回true,否则返回false。下面的例子中，当设置person1.name时就返回true，未设置或者被删除name属性时，返回false。
@@ -389,27 +392,27 @@ alert(person1.name); //”Nicholas” - from the prototype
 function Person(){
 }
 
-Person.prototype.name = “Nicholas”;
+Person.prototype.name = "Nicholas";
 Person.prototype.age = 29;
-Person.prototype.job = “Software Engineer”;
+Person.prototype.job = "Software Engineer";
 Person.prototype.sayName = function(){
 	alert(this.name);
 };
 
 var person1 = new Person();
 var person2 = new Person();
-alert(person1.hasOwnProperty(“name”)); //false
+alert(person1.hasOwnProperty("name")); //false
 
-person1.name = “Greg”;
-alert(person1.name); //”Greg” - from instance
-alert(person1.hasOwnProperty(“name”)); //true
+person1.name = "Greg";
+alert(person1.name); //"Greg" - from instance
+alert(person1.hasOwnProperty("name")); //true
 
-alert(person2.name); //”Nicholas” - from prototype
-alert(person2.hasOwnProperty(“name”)); //false
+alert(person2.name); //"Nicholas" - from prototype
+alert(person2.hasOwnProperty("name")); //false
 
 delete person1.name;
-alert(person1.name); //”Nicholas” - from the prototype
-alert(person1.hasOwnProperty(“name”)); //false
+alert(person1.name); //"Nicholas" - from the prototype
+alert(person1.hasOwnProperty("name")); //false
 ```
 
 和hasOwnProperty()方法对应的是in操作符，**in操作符不管是在实例中还是原型对象中的属性都返回true**。对于对象属性特性Enumerable的要求：**属性特性中Enumerable必须为true才会在in中找到并返回true，不管是实例对象还是原型对象**。如果使用in遍历的话，会发现原型中的属性也会被遍历到。
@@ -418,43 +421,43 @@ alert(person1.hasOwnProperty(“name”)); //false
 var person1 = new Person();
 var person2 = new Person();
 
-alert(person1.hasOwnProperty(“name”)); //false
-alert(“name” in person1); //true
+alert(person1.hasOwnProperty("name")); //false
+alert("name" in person1); //true
 
-person1.name = “Greg”;
-alert(person1.name); //”Greg” - from instance
-alert(person1.hasOwnProperty(“name”)); //true
-alert(“name” in person1); //true
+person1.name = "Greg";
+alert(person1.name); //"Greg" - from instance
+alert(person1.hasOwnProperty("name")); //true
+alert("name" in person1); //true
 
-alert(person2.name); //”Nicholas” - from prototype
-alert(person2.hasOwnProperty(“name”)); //false
-alert(“name” in person2); //true
+alert(person2.name); //"Nicholas" - from prototype
+alert(person2.hasOwnProperty("name")); //false
+alert("name" in person2); //true
 
 delete person1.name;
-alert(person1.name); //”Nicholas” - from the prototype
-alert(person1.hasOwnProperty(“name”)); //false
-alert(“name” in person1); //true
+alert(person1.name); //"Nicholas" - from the prototype
+alert(person1.hasOwnProperty("name")); //false
+alert("name" in person1); //true
 ```
 
 和in操作符对应的是Object.keys()方法，这个方法只会取对象本身的可遍历的值。
 
 ```js
 var keys = Object.keys(Person.prototype);
-alert(keys); //”name,age,job,sayName”
+alert(keys); //"name,age,job,sayName"
 
 var p1 = new Person();
-p1.name = “Rob”;
+p1.name = "Rob";
 p1.age = 31;
 
 var p1keys = Object.keys(p1);
-alert(p1keys); //”name,age”
+alert(p1keys); //"name,age"
 ```
 
 如果不管可不可以枚举都取出来，可以使用Object.getOwnPropertyNames()方法
 
 ```js
 var keys = Object.getOwnPropertyNames(Person.prototype);
-alert(keys); //”constructor,name,age,job,sayName”
+alert(keys); //"constructor,name,age,job,sayName"
 ```
 
 还可以完全**自己重新定义原型**,但是**问题**有几个：
@@ -468,9 +471,9 @@ function Person(){
 }
 Person.prototype = {
 	//constructor: Person, //解决第一个问题可能需要指回本身
-	name : “Nicholas”,
+	name : "Nicholas",
 	age : 29,
-	job : “Software Engineer”,
+	job : "Software Engineer",
 	sayName : function () {
 		alert(this.name);
 	}
@@ -488,15 +491,15 @@ alert(friend.constructor == Object); //true
 function Person(){
 }
 Person.prototype = {
-	name : “Nicholas”,
+	name : "Nicholas",
 	age : 29,
-	job : “Software Engineer”,
+	job : "Software Engineer",
 	sayName : function () {
 		alert(this.name);
 	}
 };
 //ECMAScript 5 only – restore the constructor
-Object.defi neProperty(Person.prototype, “constructor”, {
+Object.defi neProperty(Person.prototype, "constructor", {
 	enumerable: false,
 	value: Person
 });
@@ -510,9 +513,9 @@ function Person(){
 var friend = new Person();
 Person.prototype = {
 	constructor: Person,
-	name : “Nicholas”,
+	name : "Nicholas",
 	age : 29,
-	job : “Software Engineer”,
+	job : "Software Engineer",
 	sayName : function () {
 		alert(this.name);
 	}
@@ -530,16 +533,16 @@ friend.sayName(); //报错
 ```js
 var friend= new Person();
 Person.prototype.sayHi = function(){
-	alert(“hi”);
+	alert("hi");
 };
-friend.sayHi(); //”hi” - works!
+friend.sayHi(); //"hi" - works!
 ```
 
 **原生对象的原型**：原生模式的重要性还体现在了**所有原生的引用类型都是采用这种模式创建**的。如Array.prototype.sort(), String.prototype.substring()等，
 
 ```js
-alert(typeof Array.prototype.sort); //”function”
-alert(typeof String.prototype.substring); //”function”
+alert(typeof Array.prototype.sort); //"function"
+alert(typeof String.prototype.substring); //"function"
 ```
 
 
@@ -550,10 +553,10 @@ function Person(){
 }
 Person.prototype = {
 	constructor: Person,
-	name : “Nicholas”,
+	name : "Nicholas",
 	age : 29,
-	job : “Software Engineer”,
-	friends : [“Shelby”, “Court”],
+	job : "Software Engineer",
+	friends : ["Shelby", "Court"],
 	sayName : function () {
 		alert(this.name);
 	}
@@ -562,9 +565,9 @@ Person.prototype = {
 var person1 = new Person();
 var person2 = new Person();
 
-person1.friends.push(“Van”);
-alert(person1.friends); //”Shelby,Court,Van”
-alert(person2.friends); //”Shelby,Court,Van”
+person1.friends.push("Van");
+alert(person1.friends); //"Shelby,Court,Van"
+alert(person2.friends); //"Shelby,Court,Van"
 alert(person1.friends === person2.friends); //true
 ```
 
@@ -578,13 +581,13 @@ function Person(name, age, job){
 	this.age = age;
 	this.job = job;
 	//methods
-	if (typeof this.sayName != “function”){
+	if (typeof this.sayName != "function"){
 		Person.prototype.sayName = function(){
 			alert(this.name);
 		};
 	}
 }	
-var friend = new Person(“Nicholas”, 29, “Software Engineer”);
+var friend = new Person("Nicholas", 29, "Software Engineer");
 friend.sayName();
 ```
 
@@ -601,8 +604,8 @@ function Person(name, age, job){
 	};
 	return o;
 }
-var friend = new Person(“Nicholas”, 29, “Software Engineer”);
-friend.sayName(); //”Nicholas”
+var friend = new Person("Nicholas", 29, "Software Engineer");
+friend.sayName(); //"Nicholas"
 ```
 
 对不能直接修改原生对象的构造函数时，也能使用这种模式：
@@ -616,13 +619,13 @@ function SpecialArray(){
 	values.push.apply(values, arguments);
 	//assign the method
 	values.toPipedString = function(){
-		return this.join(“|”);
+		return this.join("|");
 	};
 	//return it
 	return values;
 }
-var colors = new SpecialArray(“red”, “blue”, “green”);
-alert(colors.toPipedString()); //”red|blue|green”
+var colors = new SpecialArray("red", "blue", "green");
+alert(colors.toPipedString()); //"red|blue|green"
 ```
 
 **稳妥构造函数模式**：稳妥对象是指没有公共属性，而且方法也不引用this对象，不使用new调用构造函数。除了使用sayName方法之外，不能通过其他方式访问到name。
@@ -640,6 +643,341 @@ function Person(name, age, job){
 	return o;
 }
 
-var friend = Person(“Nicholas”, 29, “Software Engineer”);
+var friend = Person("Nicholas", 29, "Software Engineer");
 friend.sayName(); //"Nicholas"
+```
+
+## 继承
+
+几种方式：借助构造函数、组合继承、原型式继承、寄生式继承、寄生组合式继承
+
+OO语言一般支持两种继承方式：接口集成和实现继承。接口集成只继承方法签名，而实现继承则集继承实际的方法。由于**函数没有签名**，因此ECMAScript只支持实现继承，且主要**依赖原型链**来实现。
+
+**原型链**：基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法。每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个指向原型对象的内部指针。
+
+实现的本质是重写原型对象，用一个新的类型对象的实例取代原来的Object原型，使新实例下的所有属性和方法都被继承下来。
+
+```js
+function SuperType(){
+	this.property = true;
+}
+SuperType.prototype.getSuperValue = function(){
+	return this.property;
+};
+function SubType(){
+	this.subproperty = false;
+}
+//inherit from SuperType
+SubType.prototype = new SuperType();
+SubType.prototype.getSubValue = function (){
+	return this.subproperty;
+};
+var instance = new SubType();
+alert(instance.getSuperValue()); //true
+```
+
+
+原型链默认的原型是Object，也就是说上面虽然SubType的原型指向了SuperType的原型，而不是指向Object，但是最终SuperType的原型还是指向Object实例。所以应该有另一个继承层次
+
+
+![](img/2016-12-06-chapter-06-object-oriented-programming-03.png)
+
+
+**确定原型和实例的关系**有两种方法，一种是instanceof关键字，另一个种是isPrototyprof方法
+
+```js
+alert(instance instanceof Object); //true
+alert(instance instanceof SuperType); //true
+alert(instance instanceof SubType); //true
+
+alert(Object.prototype.isPrototypeOf(instance)); //true
+alert(SuperType.prototype.isPrototypeOf(instance)); //true
+alert(SubType.prototype.isPrototypeOf(instance)); //true
+```
+
+
+**覆盖超类型的方法**时，要将方法放到原型方法的语句后面。
+
+```js
+function SuperType(){
+	this.property = true;
+}
+SuperType.prototype.getSuperValue = function(){
+r	eturn this.property;
+};
+function SubType(){
+	this.subproperty = false;
+}
+//inherit from SuperType
+SubType.prototype = new SuperType();
+
+//new method
+SubType.prototype.getSubValue = function (){
+	return this.subproperty;
+};
+//override existing method
+SubType.prototype.getSuperValue = function (){
+	return false;
+};
+
+var instance = new SubType();
+alert(instance.getSuperValue()); //false
+```
+
+注意，在覆盖方法的时候，切记**不能使用字面量的形式覆盖**，因为这样会重写原型链，使子类型不再指向原本已经重写的原型。
+
+```js
+function SuperType(){
+	this.property = true;
+}
+SuperType.prototype.getSuperValue = function(){
+	return this.property;
+};
+function SubType(){
+	this.subproperty = false;
+}
+//inherit from SuperType
+SubType.prototype = new SuperType();
+//try to add new methods - this nullifi es the previous line
+SubType.prototype = {
+	getSubValue : function (){
+		return this.subproperty;
+	},
+	someOtherMethod : function (){
+		return false;
+	}
+};
+
+var instance = new SubType();
+alert(instance.getSuperValue()); //error!
+```
+
+
+原型链的问题依旧是共享变量的问题,
+
+
+```js
+function SuperType(){
+	alert(this instanceof SubType); //false
+	this.colors = ["red", "blue", "green"];
+}
+function SubType(){
+}
+//inherit from SuperType
+SubType.prototype = new SuperType();
+
+var instance1 = new SubType();
+instance1.colors.push("black");
+alert(instance1.colors); //"red,blue,green,black"
+
+var instance2 = new SubType();
+alert(instance2.colors); //"red,blue,green,black"
+```
+
+
+
+为了将某些数据独立出来，应该**借用构造函数**：在子类型构造函数的内部调用超类型构造函数(函数只不过是咋特定函数执行代码的对象，我们通过call和apply将超类型中的this指向的对象改变即可，使其不再指向同一个超类型实例)。
+
+上面弹出false表明不是SubType的实例，且只弹出一次，因为是同一个原型实例；而下面代码中弹出true, this指向SubType的实例，且会弹出两次，因为会调用两次父类函数
+
+如果call不懂的话，其实可以从Java的角度去理解`SuperType.call(this)`等价于`new SuperType(this)`，所以SuperType函数中的this是子类型实例, 每new一次就调用构造函数一遍，相当于`instance1.super = new Super(this); instance2.super = new Super(this);`。而上面的代码中相当于`Super su = new Super(); instance1.super = su; instance2.super=su`，因此是执行同一个
+
+
+```js
+function SuperType(){
+	alert(this instanceof SubType); //true
+	this.colors = ["red", "blue", "green"];
+}
+function SubType(){
+	//inherit from SuperType
+	SuperType.call(this); //重点。每次都会调用SuperType构造函数创建一个新的SuperType对象
+}
+
+var instance1 = new SubType();
+instance1.colors.push("black");
+alert(instance1.colors); //"red,blue,green,black"
+
+var instance2 = new SubType();
+alert(instance2.colors); //"red,blue,green"
+```
+
+
+**传递参数**还是得借助call函数，相当于Java中的`new Super(this, 'Nicholas')`, 而父类构造函数为`SuperType(SuperType type, String name)`
+
+```js
+function SuperType(name){
+	this.name = name;
+}
+function SubType(){
+	//inherit from SuperType passing in an argument
+	SuperType.call(this, "Nicholas");
+	//instance property
+	this.age = 29;
+}
+
+var instance = new SubType();
+alert(instance.name); //"Nicholas";
+alert(instance.age); //29
+```
+
+
+借助构造函数存在一个问题，就是无法进行函数复用，因为方法都定义在构造函数中，而且在超类型的原型中定义的方法，**对子类型而言是不可见的**。
+
+```js
+SuperType.prototype.getValue = function(){
+    alert('getValue');  
+};
+var instance3 = new SubType();
+alert(instance3.getValue());  //报错：instance2.getValue is not a function(…)
+```
+
+
+
+因此借助构造函数类型的技术很少单独使用，而是使用**组合继承**的方式，这种方式最常用, 对instanceof和isPrototypeof也适用。
+
+
+```js
+// 组合继承
+function SuperType(name){
+	this.name = name;
+	this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+	alert(this.name);
+};
+function SubType(name, age){
+	//inherit properties
+	SuperType.call(this, name);
+	this.age = age;
+}
+//inherit methods
+SubType.prototype = new SuperType();
+SubType.prototype.sayAge = function(){
+	alert(this.age);
+};
+
+var instance1 = new SubType("Nicholas", 29);
+instance1.colors.push("black");
+alert(instance1.colors); //"red,blue,green,black"
+instance1.sayName(); //"Nicholas";
+instance1.sayAge(); //29
+
+var instance2 = new SubType("Greg", 27);
+alert(instance2.colors); //"red,blue,green"
+instance2.sayName(); //"Greg";
+instance2.sayAge(); //27
+```
+
+**原型式继承**：不用使用new，也就是没有使用严格意义上的构造函数。这种方式和未借助构造函数时方式是一样的，都是共享同一父类型对象，只是说这次是我们自己从参数指定。
+
+```js
+function object(o){
+	function F(){}
+	F.prototype = o;
+	return new F();
+}
+
+var person = {
+	name: "Nicholas",
+	friends: ["Shelby", "Court", "Van"]
+};
+
+var anotherPerson = object(person);
+anotherPerson.name = "Greg";
+anotherPerson.friends.push("Rob");
+
+var yetAnotherPerson = object(person);
+yetAnotherPerson.name = "Linda";
+yetAnotherPerson.friends.push("Barbie");
+alert(person.friends); //"Shelby,Court,Van,Rob,Barbie"
+```
+
+ECMAScript5中新增**Object.create()方法**规范化了原型式继承。Object.create()方法还提供了第二个参数自定义新的属性。
+
+```js
+var person = {
+	name: "Nicholas",
+	friends: ["Shelby", "Court", "Van"]
+};
+var anotherPerson = Object.create(person);
+anotherPerson.name = "Greg";
+anotherPerson.friends.push("Rob");
+var yetAnotherPerson = Object.create(person);
+yetAnotherPerson.name = "Linda";
+yetAnotherPerson.friends.push("Barbie");
+alert(person.friends); //"Shelby,Court,Van,Rob,Barbie"
+
+var anotherPerson = Object.create(person, {
+	name: {
+	value: "Greg"
+}
+});
+alert(anotherPerson.name); //"Greg"
+```
+
+**寄生式继承**：和原生式继承联系紧密，只是说直接加上了属性和方法，相当于使用了Object.create()的第二个参数。使用寄生式继承来为对象添加，会因为不能做到函数复用而降低效率，和构造函数模式相似。
+
+
+```js
+function createAnother(original){
+	var clone = object(original); //create a new object by calling a function
+	clone.sayHi = function(){ //augment the object in some way
+		alert("hi");
+	};
+	return clone; //return the object
+}
+var person = {
+	name: "Nicholas",
+	friends: ["Shelby", "Court", "Van"]
+};
+var anotherPerson = createAnother(person);
+anotherPerson.sayHi(); //"hi"
+```
+
+**寄生组合式继承**：组合继承虽然是最常用的继承模式，但是也有不足，因为每次都会调用两次超类的构造函数。
+
+```js
+function SuperType(name){
+	this.name = name;
+	this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+	alert(this.name);
+};
+function SubType(name, age){
+	SuperType.call(this, name); //第二次调用SuperType()
+	this.age = age;
+}
+
+SubType.prototype = new SuperType(); //第一次调用SuperType()
+SubType.prototype.constructor = SubType;
+SubType.prototype.sayAge = function(){
+	alert(this.age);
+};
+```
+
+```js
+// 寄生组合式继承
+function inheritPrototype(subType, superType){
+	var prototype = object(superType.prototype); //create object
+	prototype.constructor = subType; //augment object
+	subType.prototype = prototype; //assign object
+}
+
+function SuperType(name){
+	this.name = name;
+	this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+	alert(this.name);
+};
+function SubType(name, age){
+	SuperType.call(this, name);
+	this.age = age;
+}
+inheritPrototype(SubType, SuperType);
+
+SubType.prototype.sayAge = function(){
+	alert(this.age);
+};
 ```

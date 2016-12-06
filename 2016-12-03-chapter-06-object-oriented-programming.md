@@ -674,6 +674,27 @@ SubType.prototype.getSubValue = function (){
 };
 var instance = new SubType();
 alert(instance.getSuperValue()); //true
+
+```
+
+将子类型的原型修改后，尝试打印两个函数的原型分别是什么？可以看出两个的结果是一样的，也就是说SubType的原型现在是指向了SuperType, 而不是SubType，下面的图说明了这一点。
+
+
+
+
+```js
+console.log(SuperType.prototype);
+console.log(SubType.prototype);
+//结果第一个是指向Object，第二个是指向SuperType
+
+
+
+alert(SuperType.prototype.constructor);
+alert(SubType.prototype.constructor);
+// 结果
+// function SuperType(){
+//     this.property = true;
+// }
 ```
 
 
@@ -821,7 +842,7 @@ alert(instance.age); //29
 ```
 
 
-借助构造函数存在一个问题，就是无法进行函数复用，因为方法都定义在构造函数中，而且在超类型的原型中定义的方法，**对子类型而言是不可见的**。
+借助构造函数存在一个问题，就是无法进行函数复用，因为方法都定义在构造函数中，而且在超类型的原型中定义的方法，**对子类型而言是不可见的**(`console.log(SubType.prototype);`结果是Object，而SubType.prototype.constructor则指向函数本身，也就是说这种方式并没有构造出原型链，看起来有点假，从上面的Java角度也看出这两个构造函数并没有太大的联系)。
 
 ```js
 SuperType.prototype.getValue = function(){

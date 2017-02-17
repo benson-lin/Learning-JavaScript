@@ -247,3 +247,42 @@ location.pathname = “mydir”;
 location.reload(); //reload - possibly from cache
 location.reload(true); //reload - go back to the server
 ```
+
+## navigator 对象
+
+用来识别客户端浏览器，navigator对象是所有支持JavaScript的浏览器都支持的。和其他BOM对象一样，每个浏览器中的navigator对象有自己的一套属性。
+
+
+**检测插件**：对非IE浏览器而言，可以使用plugins数组达到这个目的。数组中每一项包含下列属性：name,description,filename,length。IE中需要用ActiveObject类型去创建一个特定的插件实例。IE以COM对象的方式实现插件的，而COM对象有唯一的标识，要检测是否存在，则需要先知道插件的COM标识。
+
+```js
+//plugin detection - doesn’t work in Internet Explorer
+function hasPlugin(name){
+	name = name.toLowerCase();
+	for (var i=0; i < navigator.plugins.length; i++){
+		if (navigator.plugins[i].name.toLowerCase().indexOf(name) > -1){
+			return true;
+		}
+	}
+	return false;
+}
+
+//plugin detection for Internet Explorer
+function hasIEPlugin(name){
+	try {
+		new ActiveXObject(name);
+		return true;
+	} catch (ex){
+		return false;
+	}
+}
+
+//detect flash for all browsers
+function hasFlash(){
+	var result = hasPlugin(“Flash”);
+	if (!result){
+		result = hasIEPlugin(“ShockwaveFlash.ShockwaveFlash”);
+	}
+	return result;
+}
+```

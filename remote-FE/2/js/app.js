@@ -25,7 +25,7 @@ requirejs.config({
 
 require(['jquery',  'modernizr', 'myCalculateNOAMD', 'myCalculateAMD', 'bootstrap'], function($, modernizr, myCalculateNOAMD, myCalculateAMD){
 
-	console.log(myCalculateNOAMD);
+	console.log(myCalculateNOAMD.add(1,2));
 	console.log(myCalculateAMD);
 	console.log(modernizr);
 	

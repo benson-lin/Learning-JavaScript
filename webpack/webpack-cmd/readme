@@ -1,0 +1,9 @@
+1. node_modules没有上传到github
+2. 安装webpack：npm install webpack -g 或者 npm install webpack --dev-save
+3. 安装css-loader和style-loader：npm install css-loader style-loader
+4. --module-bind绑定需要的loader，在代码中就不用写依赖的loader了
+5. --watch监听文件变化
+6. --progress添加打包过程的进度条
+7. --display-modules展示打包依赖的模块
+8. --display-reasons展示打包依赖模块的原因
+9. 使用命令行：webpack hello.js hello.bundle.js --module-bind "css=style-loader!css-loader" --watch --progress --display-modules --display-reasons

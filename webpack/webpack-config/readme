@@ -1,0 +1,45 @@
+1. node_modules没有上传到github
+
+2. npm init 初始化，获得package.json文件
+
+3. 安装webpack：npm install webpack -g 或者 npm install webpack --dev-save
+
+4. 添加webpack.confing.js文件并进行配置
+
+   ```js
+   module.exports = {
+   	entry: './src/script/main.js',
+   	output: {
+   		path: __dirname + '/dist/js',
+   		filename: 'bundle.js'
+   	}
+   }
+   ```
+
+5. 在package.json的script标签中加入webpack命令。
+
+   ```js
+   "scripts": {
+       "test": "echo \"Error: no test specified\" && exit 1",
+       "webpack": "webpack --config webpack.config.js --progress --display-modules --colors --display-reasons"
+     },
+   ```
+
+6. 使用npm run webpack跑命令打包即可
+
+   ```js
+   bensonlin@bensonlin-NB1 MINGW64 /d/git-project/Learning-JavaScript-CSS/webpack/webpack-config (master)
+   $ npm run webpack
+
+   > benson-lin@1.0.0 webpack D:\git-project\Learning-JavaScript-CSS\webpack\webpack-config
+   > webpack --config webpack.config.js --progress --display-modules --colors --display-reasons
+
+   Hash: 45ff706756a480e1f056
+   Version: webpack 3.10.0
+   Time: 63ms
+       Asset     Size  Chunks             Chunk Names
+   bundle.js  2.51 kB       0  [emitted]  main
+      [0] ./src/script/main.js 41 bytes {0} [built]
+   ```
+
+   ​

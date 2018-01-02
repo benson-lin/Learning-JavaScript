@@ -42,4 +42,4 @@
       [0] ./src/script/main.js 41 bytes {0} [built]
    ```
 
-   ​
+7. npm install html-webpack-plugin

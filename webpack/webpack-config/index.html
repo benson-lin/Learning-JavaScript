@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title><%= htmlWebpackPlugin.options.title%>!!!</title>
 	<meta charset="utf-8">
+	<!-- 需要设置inject: false-->
+<!-- 	<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.main.entry %>"></script> -->
 </head>
 <body>
+
+	<% for(var key in htmlWebpackPlugin.files) { %>
+		<%= key %> : <%= JSON.stringify(htmlWebpackPlugin.files[key]) %>
+	<% } %>
+
+	<% for(var key in htmlWebpackPlugin.options) { %>
+		<%= key %> : <%= JSON.stringify(htmlWebpackPlugin.options[key]) %>
+	<% } %>
 	<script type="text/javascript" src="./dist/js/bundle.js"></script>
+	
+<!-- 	<script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks.a.entry %>"></script> -->
 </body>
 </html>

@@ -1002,3 +1002,7 @@ SubType.prototype.sayAge = function(){
 	alert(this.age);
 };
 ```
+
+## 例子
+
+demo/oop-prototype.html

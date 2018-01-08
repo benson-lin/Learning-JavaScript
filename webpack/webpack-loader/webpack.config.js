@@ -33,19 +33,18 @@ module.exports = {
 				}
 			},
 			{
-				test: /\.css$/,
+				test: /\.(css|less|scss)$/,
 				use:['style-loader','css-loader',{
 
 					loader:'postcss-loader',
 					options:{
 						plugins:[require('postcss-import'),require('autoprefixer')],
 						browser:['last 5 versions']}
-					}
+					}, 'less-loader', 'sass-loader'
 				]
-			}
-			//npm install postcss-loader postcss-import autoprefixer --save-dev
+			},
+			{test:/\.html$/,use: {loader: 'html-loader'}}
+			//npm  babel-loader babel-core babel-preset-env style-loader postcss-loader postcss-import autoprefixer less less-loader node-sass sass-loader html-loader --save-dev
 		]
 	}
 }
-
-//npm install babel-loader babel-core babel-preset-env style-loader css-loader webpack --save-dev

@@ -1,2 +1,4 @@
 webpack/webpack-cmd/node_modules/
 webpack/webpack-config/node_modules/
+webpack/webpack-loader/node_modules/
+webpack/webpack-dev-server/node_modules/

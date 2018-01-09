@@ -7,7 +7,8 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/dist',
-		filename: 'js/[name].bundle.js'
+		filename: 'js/[name].bundle.js',
+		// publicPath: 'http://www.cdn.com'
 	},
 	plugins: [
 		new htmlWebpackPlugin({
@@ -43,8 +44,42 @@ module.exports = {
 					}, 'less-loader', 'sass-loader'
 				]
 			},
-			{test:/\.html$/,use: {loader: 'html-loader'}}
-			//npm  babel-loader babel-core babel-preset-env style-loader postcss-loader postcss-import autoprefixer less less-loader node-sass sass-loader html-loader --save-dev
+			{test:/\.html$/,use: {loader: 'html-loader'}},
+			{
+
+				test:/\.(jpg|png|gif|svg)$/i,
+				use:[
+					{
+						loader: 'url-loader',
+						options: {
+							limit: 10000,
+							name: 'img/[name].[ext]'
+						}
+					},
+					{
+						loader: 'image-webpack-loader',
+						options: {
+							gifsicle: {
+								interlaced: false
+							},
+							optipng: {
+								optimizationLevel: 7
+							},
+							pngquant: {
+								quality: '65-90',
+								speed: 4
+							},
+							mozjpeg: {
+								progressive: true,
+								quality: 65
+							}
+						}
+					}
+				]
+			}
+			//npm  babel-loader babel-core babel-preset-env style-loader postcss-loader postcss-import autoprefixer less less-loader node-sass sass-loader html-loader
+			//file-loader image-webpack-loader url-loader
+			//--save-dev
 		]
 	}
 }

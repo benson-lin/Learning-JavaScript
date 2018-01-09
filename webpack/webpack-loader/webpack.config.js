@@ -1,14 +1,19 @@
 var htmlWebpackPlugin = require('html-webpack-plugin');
+var extractTextPlugin = require('extract-text-webpack-plugin');
 var path = require('path');
+
+function join(dir) {
+  return path.join(__dirname, dir)
+}
 
 module.exports = {
 	entry: {
 		'app': './src/app.js',
 	},
 	output: {
-		path: __dirname + '/dist',
+		path: join('/dist'),
 		filename: 'js/[name].bundle.js',
-		// publicPath: 'http://www.cdn.com'
+		publicPath: '/'
 	},
 	plugins: [
 		new htmlWebpackPlugin({
@@ -19,7 +24,12 @@ module.exports = {
 				'app'
 			]
 
-		})
+		}),
+		new extractTextPlugin({
+	      filename: "css/[name].css?[hash]-[chunkhash]-[contenthash]-[name]",
+	      disable: false,
+	      allChunks: true
+	    })
 	],
 	module: {
 		loaders: [
@@ -27,22 +37,43 @@ module.exports = {
 				
 				test: /\.js$/,
 				loader: 'babel-loader',
-				include: [path.resolve(__dirname,'/src')], //__dirname + '/src/',
-				exclude: path.resolve(__dirname,'/node_modules'), //__dirname + '/node_modules/',
-				options: {
-					presets: ['env']
-				}
+				include: [join('/src')],
+				exclude: join('/node_modules'), 
+				// options: {
+				// 	presets: ['env']
+				// }
 			},
 			{
 				test: /\.(css|less|scss)$/,
-				use:['style-loader','css-loader',{
+				loader: extractTextPlugin.extract({
+					fallback: 'style-loader',
+					use:[{
+				            loader: 'css-loader',
+				            options: {
+				              sourceMap: true
+				            }
+				        },{
 
-					loader:'postcss-loader',
-					options:{
-						plugins:[require('postcss-import'),require('autoprefixer')],
-						browser:['last 5 versions']}
-					}, 'less-loader', 'sass-loader'
-				]
+							loader:'postcss-loader',
+							options:{
+								plugins:[require('postcss-import'),require('autoprefixer')],
+								browser:['last 5 versions'],
+								sourceMap: true
+							}
+						}, {
+				            loader: 'less-loader',
+				            options: {
+				                sourceMap: true
+				            }
+				        }, {
+				            loader: 'sass-loader',
+				            options: {
+				                sourceMap: true
+				            }
+				        }
+					]
+
+				})
 			},
 			{test:/\.html$/,use: {loader: 'html-loader'}},
 			{
@@ -78,7 +109,8 @@ module.exports = {
 				]
 			}
 			//npm  babel-loader babel-core babel-preset-env style-loader postcss-loader postcss-import autoprefixer less less-loader node-sass sass-loader html-loader
-			//file-loader image-webpack-loader url-loader
+			//file-loader image-webpack-loader url-loader  extract-text-webpack-plugin
+
 			//--save-dev
 		]
 	}
